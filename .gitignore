@@ -1,0 +1,17 @@
+.idea
+.vscode
+.env
+.nyc_output
+node_modules
+.log
+.DS_Store
+build
+static
+/protodefs/model.swagger.json
+/protodefs/apidocs.swagger.json
+/protodefs/*/*.json
+/terraforms/plan
+/terraforms/terraform.tfstate
+/terraforms/terraform.tfstate.backup
+/terraforms/.terraform
+/coverage

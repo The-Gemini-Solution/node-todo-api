@@ -1,0 +1,55 @@
+{
+  "name": "interview-node-challenge",
+  "version": "0.0.1",
+  "description": "Interview Node Challenge",
+  "main": "app/index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon",
+    "test": "bash -c 'export DOTENV_CONFIG_PATH=$PWD/.env.test; nyc --reporter=text mocha -r dotenv/config \"./src/**/*.spec.js\" --timeout=5000 --exit'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:thegeminisolution/koodoo/experimentation/interview-node-challenge.git"
+  },
+  "author": "The Gemini Solution",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "bcrypt": "^5.0.0",
+    "dotenv": "^8.2.0",
+    "koa": "^2.13.0",
+    "koa-better-body": "^3.3.9",
+    "koa-convert": "^2.0.0",
+    "koa-mount": "^4.0.0",
+    "koa-router": "^10.0.0",
+    "koa-session": "^6.1.0",
+    "lodash": "^4.17.20",
+    "moment": "^2.29.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.2.1",
+    "nodemon": "^2.0.6",
+    "nyc": "^15.1.0",
+    "sinon": "^9.2.1"
+  },
+  "nodemonConfig": {
+    "delay": "2500",
+    "watch": [
+      "src"
+    ],
+    "ext": "js",
+    "ignore": [
+      "src/**/*.spec.ts"
+    ],
+    "exec": "node -r dotenv/config ./src/index.js dotenv_config_path=.env"
+  },
+  "nyc": {
+    "exclude": [
+      "**/*.spec.js",
+      "**/tests/**/*.js",
+      "static"
+    ]
+  }
+}
