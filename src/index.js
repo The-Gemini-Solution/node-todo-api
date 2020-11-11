@@ -4,13 +4,17 @@ const koaBetterBody = require("koa-better-body");
 const convert = require("koa-convert");
 const mount = require("koa-mount");
 const session = require("koa-session");
+const { Sequelize } = require('sequelize');
 // Router imports
 const todoRoutes = require("./routes/todo");
 
 const PORT = process.env.PORT || 3000;
+const DATABASE_URI = process.env.DATABASE_URI || 'sqlite::memory';
 
 const main = async () => {
   const app = new Koa();
+  const sequelize = new Sequelize(DATABASE_URI);
+  
   app.use(session({key: 'koa.sess'}, app));
   app.use(convert(koaBetterBody({fields: "body"})));
 
