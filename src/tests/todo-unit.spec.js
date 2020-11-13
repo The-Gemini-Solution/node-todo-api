@@ -1,21 +1,35 @@
 const chai = require('chai')
-const { it, describe, afterEach } = require('mocha');
+const { it, describe, afterEach, before } = require('mocha');
+const moment = require('moment');
 const assert = chai.assert;
 // Application imports
-const Todo = require("../models/todo");
+const { Todo, sequelize } = require("../database");
+const TodoModel = require("../models/todo");
 
 describe("MODEL: todo", async function () {
 
+  before(async function () {
+    await sequelize.sync();
+  });
+
   afterEach(async function () {
-    await Todo.sqlModel.destroy({ truncate: true });
+    await Todo.destroy({ truncate: true });
   });
 
   describe("list", async function () {
     it("should return a list of todos", async function () {
-      const todoOne = await Todo.sqlModel.create({task: 'not-completed'});
-      const todoTwo = await Todo.sqlModel.create({task: 'is-completed', completed: true});
+      // // Cool potential problem here, sequelize returns the db entry before it is written to disk.
+      // //  this means that the timestamps are generate within 1ms from one another resulting in the 
+      // //  same timestamps being generated for these two entries
+      // //  This test relies on them being created one after the other with distinct different timestamps.
+      // //  This will fail intermittently.
+      // const todoOne = await Todo.create({task: 'not-completed'});
+      // const todoTwo = await Todo.create({task: 'is-complete', completed: true});
+      
+      const todoOne = await Todo.create({task: 'not-completed', createdAt: moment().subtract(1, 'minute').toDate()});
+      const todoTwo = await Todo.create({task: 'is-complete', completed: true});
 
-      const todos = await Todo.list();
+      const todos = await TodoModel.list();
 
       assert.exists(todos[0]);
       assert.exists(todos[1]);
@@ -28,15 +42,15 @@ describe("MODEL: todo", async function () {
 
   describe("get", async function () {
     it("should return a single todo", async function () {
-      const todo = await Todo.sqlModel.create({task: 'something'});
+      const todo = await Todo.create({task: 'something'});
 
-      const found = await Todo.get(todo.id);
+      const found = await TodoModel.get(todo.id);
       assert.equal(todo.id, found.id);
     });
 
     it("should throw an error for id not being a string", async function () {
       try {
-        await Todo.get(1);
+        await TodoModel.get(1);
       } catch (e) {
         assert.exists(e);
         assert.isTrue(e.message.indexOf('id needs to be a string') > -1);
@@ -48,7 +62,7 @@ describe("MODEL: todo", async function () {
 
   describe("create", async function () {
     it("should create a todo", async function () {
-      const todo = await Todo.create({task: 'something'});
+      const todo = await TodoModel.create({task: 'something'});
 
       assert.exists(todo.id);
       assert.equal(todo.task, 'something');
@@ -57,7 +71,7 @@ describe("MODEL: todo", async function () {
 
     it("should throw an error for task not being a string", async function () {
       try {
-        await Todo.create({task: 1});
+        await TodoModel.create({task: 1});
       } catch (e) {
         assert.exists(e);
         assert.isTrue(e.message.indexOf('data.task needs to be set as string') > -1);
@@ -69,16 +83,16 @@ describe("MODEL: todo", async function () {
 
   describe("update", async function () {
     it("should update a todo", async function () {
-      const todo = await Todo.sqlModel.create({task: 'something'});
+      const todo = await Todo.create({task: 'something'});
       assert.isFalse(todo.completed);
 
-      const updated = await Todo.update(todo.id, {completed: true});
+      const updated = await TodoModel.update(todo.id, {completed: true});
       assert.isTrue(updated.completed);
     });
 
     it("should throw an error for id not being a string", async function () {
       try {
-        await Todo.update(1, {});
+        await TodoModel.update(1, {});
       } catch (e) {
         assert.exists(e);
         assert.isTrue(e.message.indexOf('id needs to be a string') > -1);
@@ -89,7 +103,7 @@ describe("MODEL: todo", async function () {
 
     it("should throw an error for completed not being a boolean", async function () {
       try {
-        await Todo.update("123", {completed: "true"});
+        await TodoModel.update("123", {completed: "true"});
       } catch (e) {
         assert.exists(e);
         assert.isTrue(e.message.indexOf('data.completed should to be a boolean') > -1);
@@ -100,7 +114,7 @@ describe("MODEL: todo", async function () {
 
     it("should throw an error for taks not being a string", async function () {
       try {
-        await Todo.update("123", {task: 1});
+        await TodoModel.update("123", {task: 1});
       } catch (e) {
         assert.exists(e);
         assert.isTrue(e.message.indexOf('data.task should be a string') > -1);
@@ -112,16 +126,16 @@ describe("MODEL: todo", async function () {
 
   describe("destroy", async function () {
     it("should destroy a todo", async function () {
-      const todo = await Todo.sqlModel.create({task: 'something'});
+      const todo = await Todo.create({task: 'something'});
 
-      await Todo.remove(todo.id);
-      const removed = await Todo.sqlModel.findByPk(todo.id);
+      await TodoModel.remove(todo.id);
+      const removed = await Todo.findByPk(todo.id);
       assert.notExists(removed);
     });
 
     it("should throw an error for id not being a string", async function () {
       try {
-        await Todo.remove(1);
+        await TodoModel.remove(1);
       } catch (e) {
         assert.exists(e);
         assert.isTrue(e.message.indexOf('id needs to be a string') > -1);

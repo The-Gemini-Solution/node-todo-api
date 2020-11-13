@@ -4,19 +4,26 @@ const koaBetterBody = require("koa-better-body");
 const convert = require("koa-convert");
 const mount = require("koa-mount");
 const session = require("koa-session");
-const { Sequelize } = require('sequelize');
+const jwt = require('koa-jwt');
+const database = require("./database");
 // Router imports
 const todoRoutes = require("./routes/todo");
+const authRoutes = require("./routes/auth");
 
 const PORT = process.env.PORT || 3000;
-const DATABASE_URI = process.env.DATABASE_URI || 'sqlite::memory';
 
 const main = async () => {
+  // Create the database tables
+  await database.sequelize.sync();
   const app = new Koa();
-  const sequelize = new Sequelize(DATABASE_URI);
   
   app.use(session({key: 'koa.sess'}, app));
   app.use(convert(koaBetterBody({fields: "body"})));
+  
+  app.use(mount(authRoutes.allowedMethods()));
+  app.use(mount(authRoutes.routes()));
+
+  app.use(jwt({ secret: process.env.API_SECRET }));
 
   app.use(mount(todoRoutes.allowedMethods()));
   app.use(mount(todoRoutes.routes()));
