@@ -54,7 +54,7 @@ describe("API: todo", async function () {
   
   describe("GET:/todo/:id", async function () {
     it("should return a 200 status for get /todo/:id", async function () {
-      const todo = await Todo.sqlModel.create({task: 'test-task'});
+      const todo = await Todo.sqlModel.create({task: 'test-task', userId: context.user.id});
       const response = await chai.request(context.app).get(`/todo/${todo.id}`)
         .set('Authorization', `Bearer ${context.token}`);;
 
@@ -80,7 +80,7 @@ describe("API: todo", async function () {
 
   describe("PUT:/todo/:id", async function () {
     it("should return a 200 status for put /todo/:id", async function () {
-      const todo = await Todo.sqlModel.create({task: 'test-task'});
+      const todo = await Todo.sqlModel.create({task: 'test-task', userId: context.user.id});
 
       const response = await chai.request(context.app)
         .put(`/todo/${todo.id}`)
