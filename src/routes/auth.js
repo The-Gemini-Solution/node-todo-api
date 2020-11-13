@@ -14,7 +14,6 @@ router.post("/register", async (ctx, next) => {
 router.post("/login", async (ctx, next) => {
   const user = await User.getByEmail(ctx.request.body.email);
   const isValid = await bcrypt.compare(ctx.request.body.password, user.password);
-  console.log(isValid, 'IS VALID', ctx.request.body.password);
   if (isValid) {
     return ctx.body = {
       token: jwt.sign(JSON.parse(JSON.stringify(user)), process.env.API_SECRET, { expiresIn: '1h' })
