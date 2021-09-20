@@ -29,7 +29,7 @@ The API is missing a working front-end. To complete the challenge, do the follow
   - Unit tests; you do not need full coverage. A few components is fine.
 - Please consider your git history as this will be reviewed
   - Commit & push code regularly
-- Once complete, please send a link to your repository to tim@geminisolution.co.za or elrika@geminisolution.co.za
+- Once complete, please send a link to your repository to careers@geminisolution.co.za
 # Dependencies:
 Node v12.6.3
 
